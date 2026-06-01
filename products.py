@@ -51,20 +51,42 @@ class Product:
         return quantity * self.price
 
 
-def main():
-    bose = Product("Bose QuietComfort Earbuds", price=250, quantity=500)
-    mac = Product("MacBook Air M2", price=1450, quantity=100)
+class NonStockedProduct(Product):
+    def __init__(self, name, price):
+        super().__init__(name, price, 0)
 
-    print(bose.buy(50))
-    print(mac.buy(100))
-    print(mac.is_active())
+    def set_quantity(self, quantity):
+        self.quantity = 0
 
-    bose.show()
-    mac.show()
+    def buy(self, quantity):
+        if quantity <= 0:
+            raise ValueError("Quantity must be greater than 0")
 
-    bose.set_quantity(1000)
-    bose.show()
+        return quantity * self.price
+
+    def show(self):
+        print(f"{self.name}, Price: {self.price}, Quantity: Unlimited")
 
 
-if __name__ == "__main__":
-    main()
+class LimitedProduct(Product):
+    def __init__(self, name, price, quantity, maximum):
+        if maximum <= 0:
+            raise ValueError("Maximum must be greater than 0")
+
+        super().__init__(name, price, quantity)
+        self.maximum = maximum
+
+    def show(self):
+        print(
+            f"{self.name}, Price: {self.price}, "
+            f"Quantity: {self.quantity}, Maximum per order: {self.maximum}"
+        )
+
+    def buy(self, quantity):
+        if quantity > self.maximum:
+            raise ValueError(
+                f"Cannot buy more than {self.maximum} units of this product"
+            )
+
+        return super().buy(quantity)
+
