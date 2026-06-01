@@ -1,5 +1,6 @@
 import products
 import store
+import promotions
 
 
 def list_products(best_buy):

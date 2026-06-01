@@ -11,6 +11,7 @@ class Product:
         self.price = price
         self.quantity = quantity
         self.active = True
+        self.promotion = None
 
     def get_quantity(self):
         return self.quantity
@@ -33,8 +34,22 @@ class Product:
     def deactivate(self):
         self.active = False
 
+    def get_promotion(self):
+        return self.promotion
+
+    def set_promotion(self, promotion):
+        self.promotion = promotion
+
     def show(self):
-        print(f"{self.name}, Price: {self.price}, Quantity: {self.quantity}")
+        promotion_text = ""
+
+        if self.promotion:
+            promotion_text = f", Promotion: {self.promotion.name}"
+
+        print(
+            f"{self.name}, Price: {self.price}, "
+            f"Quantity: {self.quantity}{promotion_text}"
+        )
 
     def buy(self, quantity):
         if quantity <= 0:
@@ -47,6 +62,9 @@ class Product:
 
         if self.quantity == 0:
             self.deactivate()
+
+        if self.promotion:
+            return self.promotion.apply_promotion(self, quantity)
 
         return quantity * self.price
 
@@ -62,10 +80,21 @@ class NonStockedProduct(Product):
         if quantity <= 0:
             raise ValueError("Quantity must be greater than 0")
 
+        if self.promotion:
+            return self.promotion.apply_promotion(self, quantity)
+
         return quantity * self.price
 
     def show(self):
-        print(f"{self.name}, Price: {self.price}, Quantity: Unlimited")
+        promotion_text = ""
+
+        if self.promotion:
+            promotion_text = f", Promotion: {self.promotion.name}"
+
+        print(
+            f"{self.name}, Price: {self.price}, "
+            f"Quantity: Unlimited{promotion_text}"
+        )
 
 
 class LimitedProduct(Product):
@@ -76,12 +105,6 @@ class LimitedProduct(Product):
         super().__init__(name, price, quantity)
         self.maximum = maximum
 
-    def show(self):
-        print(
-            f"{self.name}, Price: {self.price}, "
-            f"Quantity: {self.quantity}, Maximum per order: {self.maximum}"
-        )
-
     def buy(self, quantity):
         if quantity > self.maximum:
             raise ValueError(
@@ -90,3 +113,14 @@ class LimitedProduct(Product):
 
         return super().buy(quantity)
 
+    def show(self):
+        promotion_text = ""
+
+        if self.promotion:
+            promotion_text = f", Promotion: {self.promotion.name}"
+
+        print(
+            f"{self.name}, Price: {self.price}, "
+            f"Quantity: {self.quantity}, "
+            f"Maximum per order: {self.maximum}{promotion_text}"
+        )
